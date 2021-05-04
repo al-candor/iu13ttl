@@ -1,0 +1,90 @@
+---
+- hosts: access-switch-03
+  gather_facts: yes
+  connection: network_cli
+
+  vars_prompt:
+
+    - name: ansible_user
+      prompt: What is your username?
+      private: no
+
+    - name: ansible_password
+      prompt: What is your password?
+
+  vars:
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_network_os: ios
+    hostname: access-switch-03
+    vlan99_ip: 10.0.0.13 255.255.255.0
+
+  tasks:
+    
+    - import_tasks: cisco-base.yml
+   
+    - name: configure-hostname
+      ios_config:
+       lines:
+       - hostname {{ hostname }}
+      tags:
+      - device
+
+    - name: configure-stp
+      ios_config:
+       lines:
+       - spanning-tree mode rapid-pvst
+       - spanning-tree vlan 1-4094 priority 4096
+      tags:
+      - device
+
+    - name: configure-vtp
+      ios_config:
+       lines:
+       - vtp domain test
+       - vtp mode client
+       - vtp password testing123!!
+      tags:
+      - device
+
+    - name: configure-interface-vlan99
+      ios_config:
+       parents: interface vlan 99
+       lines:
+       - interface vlan 99
+       - ip address {{ vlan99_ip }}
+       - no shutdown
+      tags:
+      - device
+
+    - name: configure-interface-g01
+      ios_config:
+       parents: interface gi0/1
+       lines:
+       - switchport trunk encapsulation dot1q
+       - switchport mode trunk
+       - switchport trunk allowed vlan 1,99
+       - no shutdown
+      tags:
+      - device
+
+    - name: Pause to let interfaces come up
+      pause:
+       seconds: 5
+
+
+    - name: Test reachability to the core
+      ios_ping:
+       dest: 10.0.0.1
+       source: vlan 99
+      tags:
+      - device
+      - test
+
+    - name: save running to startup when modified
+      ios_config:
+        save_when: modified
+      tags:
+      - base
+      - device
+      - save
