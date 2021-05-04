@@ -68,6 +68,11 @@
       tags:
       - device
 
+    - name: Pause to let interfaces come up
+      pause:
+       seconds: 5
+
+
     - name: Test reachability to the core
       ios_ping:
        dest: 10.0.0.1
