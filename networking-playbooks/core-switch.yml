@@ -1,6 +1,6 @@
 ---
 - hosts: core-switch
-  gather_facts: no
+  gather_facts: yes
   connection: network_cli
 
   vars_prompt:

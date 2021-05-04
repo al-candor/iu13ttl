@@ -1,6 +1,6 @@
 ---
 - hosts: access-switch-01
-  gather_facts: no
+  gather_facts: yes
   connection: network_cli
 
   vars_prompt:
