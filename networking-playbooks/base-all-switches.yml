@@ -1,0 +1,22 @@
+---
+- hosts: ios_switches
+  gather_facts: no
+  connection: network_cli
+
+  vars_prompt:
+
+    - name: ansible_user
+      prompt: What is your username?
+      private: no
+
+    - name: ansible_password
+      prompt: What is your password?
+
+  vars:
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_network_os: ios
+
+  tasks:
+
+    - import_tasks: cisco-base.yml

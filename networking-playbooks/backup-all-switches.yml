@@ -1,0 +1,44 @@
+---
+- hosts: ios_switches
+  gather_facts: no
+  connection: network_cli
+
+  vars_prompt:
+
+    - name: ansible_user
+      prompt: What is your username?
+      private: no
+
+    - name: ansible_password
+      prompt: What is your password?
+
+  vars:
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_network_os: ios
+    backup_root: ./backups
+
+  tasks:
+    - name: run show running-config on remote devices
+      ios_command:
+        commands: show running
+      register: config
+
+    - name: ensure backup folder is created
+      file:
+        path: "{{ backup_root }}"
+        state: directory
+      run_once: yes
+
+    - name: ensure device rolder is created
+      file:
+        path: "{{ backup_root }}/{{ inventory_hostname }}"
+        state: directory
+
+    - name: get timestamp
+      command: date +%Y%m%d_"%H-%M-%S"
+      register: timestamp
+
+    - copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "{{ backup_root }}/{{ inventory_hostname }}/running-config_{{ timestamp.stdout }}"

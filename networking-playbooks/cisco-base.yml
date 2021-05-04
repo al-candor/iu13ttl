@@ -1,0 +1,55 @@
+- name: configure-admin
+  ios_config:
+    lines:
+    - username admin privilege 15 secret 5 $1$CTx8$fs4fBGnyiVCxI/P6.nX.q1
+  tags:
+  - base
+
+- name: configure-dns
+  ios_config:
+    lines:
+    - ip name-server 208.67.220.220
+    - ip name-server 208.67.222.222
+  tags:
+  - base
+
+- name: configure-ntp
+  ios_config:
+    lines:
+    - ntp server 0.us.pool.ntp.org
+    - ntp server 1.us.pool.ntp.org
+  tags:
+  - base
+
+- name: configure-mgmt-acl
+  ios_config:
+    parents: ip access-list standard mgmt
+    lines:
+    - permit 192.168.68.0 0.0.0.255
+    - permit 192.168.69.0 0.0.0.255
+  tags:
+  - base
+
+- name: configure-console
+  ios_config:
+    parents: line con 0
+    lines:
+    - login local
+  tags:
+  - base
+
+- name: configure-line
+  ios_config:
+    parents: line vty 0 15
+    lines:
+    - login local
+    - access-class mgmt in
+  tags:
+  - base
+
+- name: configure-snmp
+  ios_config:
+    lines:
+    - snmp-server community testing123!! rw mgmt
+  tags:
+  - base

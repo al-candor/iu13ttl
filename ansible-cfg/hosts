@@ -1,0 +1,8 @@
+[ios_switches]
+core-switch ansible_host=192.168.69.105
+access-switch-01 ansible_host=192.168.69.108
+access-switch-02 ansible_host=
+access-switch-03 ansible_host=
+
+[linux_servers]
+ubuntu ansible_host=192.168.69.107
